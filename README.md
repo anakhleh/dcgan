@@ -1,4 +1,11 @@
-# DCGAN in TensorFlow
+# Fork of zsdonghao's DCGAN in TensorFlow
+
+## Motivation
+This fork was done primarily as an exploration of GAN and setting up an environment for Tensorflow with GPU.
+The dataset used was a relatively small dataset (n=5000) of faces drawn by various artists found on the web.
+Results shown in results folders are the results of generating images for 300 epochs, with zsdonghao's default batch size.
+The folder labelled 'Run 1' used test images of size 128x128px to train the discriminator, with a generator producing images of size 64x64px.
+The folder labelled 'Run 2' used test images of size 128x128px to train the discriminator, with a generator producing images of size 128x128px.
 
 TensorFlow / TensorLayer implementation of [Deep Convolutional Generative Adversarial Networks](http://arxiv.org/abs/1511.06434) which is a stabilize Generative Adversarial Networks.
 
@@ -8,6 +15,8 @@ Looking for Text to Image Synthesis ? [click here](https://github.com/zsdonghao/
 
 * [Brandon Amos](http://bamos.github.io/) wrote an excellent [blog post](http://bamos.github.io/2016/08/09/deep-completion/) and [image completion code](https://github.com/bamos/dcgan-completion.tensorflow) based on this repo.
 * *To avoid the fast convergence of D (discriminator) network, G (generator) network is updated twice for each D network update, which differs from original paper.*
+
+
 
 
 ## Prerequisites
