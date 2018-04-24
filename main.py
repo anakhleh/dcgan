@@ -1,4 +1,5 @@
-import os, pprint, time
+import os, sys, pprint, time
+import scipy.misc
 import numpy as np
 import tensorflow as tf
 import tensorlayer as tl
@@ -21,8 +22,8 @@ flags.DEFINE_float("learning_rate", 0.0002, "Learning rate of for adam [0.0002]"
 flags.DEFINE_float("beta1", 0.5, "Momentum term of adam [0.5]")
 flags.DEFINE_integer("train_size", np.inf, "The size of train images [np.inf]")
 flags.DEFINE_integer("batch_size", 64, "The number of batch images [64]")
-flags.DEFINE_integer("image_size", 108, "The size of image to use (will be center cropped) [108]")
-flags.DEFINE_integer("output_size", 64, "The size of the output images to produce [64]")
+flags.DEFINE_integer("image_size", 128, "The size of image to use (will be center cropped) [108]")
+flags.DEFINE_integer("output_size", 128, "The size of the output images to produce [64]")
 flags.DEFINE_integer("sample_size", 64, "The number of sample images [64]")
 flags.DEFINE_integer("c_dim", 3, "Dimension of image color. [3]")
 flags.DEFINE_integer("sample_step", 500, "The interval of generating sample. [500]")
@@ -110,7 +111,7 @@ def main(_):
         ## load image data
         batch_idxs = min(len(data_files), FLAGS.train_size) // FLAGS.batch_size
 
-        for idx in range(0, batch_idxs):
+        for idx in xrange(0, batch_idxs):
             batch_files = data_files[idx*FLAGS.batch_size:(idx+1)*FLAGS.batch_size]
             ## get real images
             # more image augmentation functions in http://tensorlayer.readthedocs.io/en/latest/modules/prepro.html
