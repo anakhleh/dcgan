@@ -17,8 +17,8 @@ TensorLayer implementation of DCGAN to generate face image.
 Usage : see README.md
 """
 flags = tf.app.flags
-flags.DEFINE_integer("epoch", 25, "Epoch to train [25]")
-flags.DEFINE_float("learning_rate", 0.0002, "Learning rate of for adam [0.0002]")
+flags.DEFINE_integer("epoch", 200, "Epoch to train [25]")
+flags.DEFINE_float("learning_rate", 0.005, "Learning rate of for adam [0.0002]")
 flags.DEFINE_float("beta1", 0.5, "Momentum term of adam [0.5]")
 flags.DEFINE_integer("train_size", np.inf, "The size of train images [np.inf]")
 flags.DEFINE_integer("batch_size", 64, "The number of batch images [64]")
@@ -26,15 +26,16 @@ flags.DEFINE_integer("image_size", 128, "The size of image to use (will be cente
 flags.DEFINE_integer("output_size", 128, "The size of the output images to produce [64]")
 flags.DEFINE_integer("sample_size", 64, "The number of sample images [64]")
 flags.DEFINE_integer("c_dim", 3, "Dimension of image color. [3]")
-flags.DEFINE_integer("sample_step", 500, "The interval of generating sample. [500]")
-flags.DEFINE_integer("save_step", 500, "The interval of saveing checkpoints. [500]")
-flags.DEFINE_string("dataset", "celebA", "The name of dataset [celebA, mnist, lsun]")
+flags.DEFINE_integer("sample_step", 50, "The interval of generating sample. [500]")
+flags.DEFINE_integer("save_step", 100, "The interval of saveing checkpoints. [500]")
+flags.DEFINE_string("dataset", "K_artfaces_portraitfaces2_prep_eql", "The name of dataset [K_artfaces_portraitfaces2_prep_eql, mnist, lsun]")
 flags.DEFINE_string("checkpoint_dir", "checkpoint", "Directory name to save the checkpoints [checkpoint]")
 flags.DEFINE_string("sample_dir", "samples", "Directory name to save the image samples [samples]")
 flags.DEFINE_boolean("is_train", False, "True for training, False for testing [False]")
 flags.DEFINE_boolean("is_crop", True, "True for training, False for testing [False]")
 flags.DEFINE_boolean("visualize", False, "True for visualizing, False for nothing [False]")
 FLAGS = flags.FLAGS
+print('set flags')
 
 def main(_):
     pp.pprint(flags.FLAGS.__flags)
@@ -42,7 +43,7 @@ def main(_):
     tl.files.exists_or_mkdir(FLAGS.checkpoint_dir)
     tl.files.exists_or_mkdir(FLAGS.sample_dir)
 
-    z_dim = 100
+    z_dim = 100#100 originally
     with tf.device("/gpu:0"):
         ##========================= DEFINE MODEL ===========================##
         z = tf.placeholder(tf.float32, [FLAGS.batch_size, z_dim], name='z_noise')
@@ -57,6 +58,8 @@ def main(_):
         # sample_z --> generator for evaluation, set is_train to False
         # so that BatchNormLayer behave differently
         net_g2, g2_logits = generator_simplified_api(z, is_train=False, reuse=True)
+        
+        print('Defined Model')
 
         ##========================= DEFINE TRAIN OPS =======================##
         # cost for updating discriminator and generator
@@ -80,6 +83,7 @@ def main(_):
                           .minimize(d_loss, var_list=d_vars)
         g_optim = tf.train.AdamOptimizer(FLAGS.learning_rate, beta1=FLAGS.beta1) \
                           .minimize(g_loss, var_list=g_vars)
+                    
 
     sess = tf.InteractiveSession()
     tl.layers.initialize_global_variables(sess)
@@ -92,7 +96,9 @@ def main(_):
     net_g_name = os.path.join(save_dir, 'net_g.npz')
     net_d_name = os.path.join(save_dir, 'net_d.npz')
 
-    data_files = glob(os.path.join("./data", FLAGS.dataset, "*.jpg"))
+    data_files = glob(os.path.join("E:\\", FLAGS.dataset, "*.jpg"))
+#    print(len(data_files))
+#    sys.exit()
 
     sample_seed = np.random.normal(loc=0.0, scale=1.0, size=(FLAGS.sample_size, z_dim)).astype(np.float32)# sample_seed = np.random.uniform(low=-1, high=1, size=(FLAGS.sample_size, z_dim)).astype(np.float32)
 
@@ -109,6 +115,7 @@ def main(_):
         print("[*] Sample images updated!")
 
         ## load image data
+
         batch_idxs = min(len(data_files), FLAGS.train_size) // FLAGS.batch_size
 
         for idx in xrange(0, batch_idxs):
